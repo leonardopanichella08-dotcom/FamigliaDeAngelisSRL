@@ -756,9 +756,14 @@
 
     <form id="project-form" class="glass-solid fade-up p-6 md:p-10 grid sm:grid-cols-2 gap-6">
 
+      <!-- Consegna via FormSubmit.co: nessuna registrazione, invia le risposte via email. -->
+      <input type="hidden" name="_subject" value="Nuova richiesta progetto — sito Famiglia De Angelis">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+
       <div class="sm:col-span-2">
         <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tipologia di progetto *</label>
-        <select required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
+        <select name="Tipologia di progetto" required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
           <option value="">Seleziona...</option>
           <option>Film / TV</option>
           <option>Evento / Allestimento</option>
@@ -769,22 +774,22 @@
 
       <div>
         <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Nome Azienda / Produzione / Nome e Cognome *</label>
-        <input type="text" required placeholder="Es. Mario Rossi / Cinecittà Studios" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
+        <input type="text" name="Nome" required placeholder="Es. Mario Rossi / Cinecittà Studios" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
       </div>
 
       <div>
         <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Telefono *</label>
-        <input type="tel" required placeholder="+39 000 000 0000" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
+        <input type="tel" name="Telefono" required placeholder="+39 000 000 0000" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
       </div>
 
       <div class="sm:col-span-2">
         <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Email *</label>
-        <input type="email" required placeholder="nome@azienda.com" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
+        <input type="email" name="email" required placeholder="nome@azienda.com" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
       </div>
 
       <div>
         <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tempistiche desiderate *</label>
-        <select required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
+        <select name="Tempistiche" required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
           <option value="">Seleziona...</option>
           <option>Urgente (&lt; 2 settimane)</option>
           <option>1 - 3 mesi</option>
@@ -794,7 +799,7 @@
 
       <div>
         <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Budget indicativo *</label>
-        <select required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
+        <select name="Budget" required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
           <option value="">Seleziona...</option>
           <option>&lt; 5.000€</option>
           <option>5.000€ - 15.000€</option>
@@ -805,7 +810,7 @@
 
       <div class="sm:col-span-2">
         <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Descrizione del progetto / Note *</label>
-        <textarea required rows="5" placeholder="Raccontaci il tuo progetto: contesto, riferimenti, esigenze particolari..." class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600 resize-none"></textarea>
+        <textarea name="Descrizione progetto" required rows="5" placeholder="Raccontaci il tuo progetto: contesto, riferimenti, esigenze particolari..." class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600 resize-none"></textarea>
       </div>
 
       <div class="sm:col-span-2">
@@ -815,7 +820,7 @@
           <span id="file-label" class="text-sm text-gray-500">Trascina i file qui o <span class="text-gold">sfoglia</span></span>
           <span class="text-xs text-gray-600">PDF, JPG, PNG — max 20MB</span>
         </label>
-        <input id="file-upload" type="file" class="hidden" multiple accept=".pdf,.jpg,.jpeg,.png">
+        <input id="file-upload" type="file" name="Allegato" class="hidden" multiple accept=".pdf,.jpg,.jpeg,.png">
       </div>
 
       <div class="sm:col-span-2 flex items-start gap-3">
@@ -824,13 +829,16 @@
       </div>
 
       <div class="sm:col-span-2 pt-2">
-        <button type="submit" class="btn-apple btn-glossy w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-gold text-cinema-black font-semibold px-9 py-4 tracking-wide hover:bg-gold-light">
+        <button type="submit" id="project-form-submit" class="btn-apple btn-glossy w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-gold text-cinema-black font-semibold px-9 py-4 tracking-wide hover:bg-gold-light">
           Invia Richiesta Progetto
         </button>
       </div>
 
       <div id="form-feedback" class="sm:col-span-2 hidden rounded-lg border border-gold/40 bg-gold/10 text-gold-light text-sm px-5 py-4">
         Grazie! La tua richiesta è stata inviata. Il nostro team ti risponderà entro 48 ore lavorative.
+      </div>
+      <div id="form-error" class="sm:col-span-2 hidden rounded-lg border border-red-500/40 bg-red-500/10 text-red-300 text-sm px-5 py-4">
+        Non siamo riusciti a inviare la richiesta. Riprova, oppure scrivici direttamente a info@famigliadeangelis.it.
       </div>
     </form>
   </div>
@@ -1017,16 +1025,39 @@
 
   const projectForm = document.getElementById('project-form');
   const formFeedback = document.getElementById('form-feedback');
+  const formError = document.getElementById('form-error');
+  const formSubmitBtn = document.getElementById('project-form-submit');
+  const FORM_ENDPOINT = 'https://formsubmit.co/ajax/leonardopanichella08@gmail.com';
 
   projectForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    formFeedback.classList.remove('hidden');
-    formFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    setTimeout(() => {
-      projectForm.reset();
-      fileLabel.innerHTML = 'Trascina i file qui o <span class="text-gold">sfoglia</span>';
-      formFeedback.classList.add('hidden');
-    }, 4500);
+    formError.classList.add('hidden');
+    formSubmitBtn.disabled = true;
+    formSubmitBtn.style.opacity = '.6';
+
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(projectForm)
+    })
+      .then((res) => { if (!res.ok) throw new Error('Invio fallito'); return res.json(); })
+      .then(() => {
+        formFeedback.classList.remove('hidden');
+        formFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => {
+          projectForm.reset();
+          fileLabel.innerHTML = 'Trascina i file qui o <span class="text-gold">sfoglia</span>';
+          formFeedback.classList.add('hidden');
+        }, 4500);
+      })
+      .catch(() => {
+        formError.classList.remove('hidden');
+        formError.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      })
+      .finally(() => {
+        formSubmitBtn.disabled = false;
+        formSubmitBtn.style.opacity = '';
+      });
   });
 </script>
 
