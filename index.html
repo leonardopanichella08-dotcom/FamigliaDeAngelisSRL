@@ -346,17 +346,16 @@
   /* ============ SERVIZI — carosello 3D di capsule di vetro su pavimento liquido ============ */
   .svc-carousel{ perspective: 1600px; }
   .glass-floor{
-    position:absolute; left:0; right:0; bottom:34px; height:150px; z-index:0;
+    position:absolute; left:0; right:0; bottom:22px; height:190px; z-index:0;
+    pointer-events:none;
     background:
-      radial-gradient(70% 120% at 50% 0%, rgba(230,197,148,0.12), transparent 72%),
-      linear-gradient(180deg, rgba(255,255,255,0.05), transparent 65%);
-    -webkit-backdrop-filter: blur(10px) saturate(140%); backdrop-filter: blur(10px) saturate(140%);
-    border-top: 0.5px solid rgba(230,197,148,0.18);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+      radial-gradient(55% 82% at 50% 100%, rgba(230,197,148,0.10) 0%, rgba(212,175,55,0.05) 38%, transparent 74%);
+    -webkit-mask-image: radial-gradient(75% 100% at 50% 100%, #000 20%, transparent 80%);
+    mask-image: radial-gradient(75% 100% at 50% 100%, #000 20%, transparent 80%);
   }
   .carousel-track{ scroll-padding-inline: 50%; }
-  .carousel-track::before, .carousel-track::after{ content:""; flex:0 0 4%; }
+  .carousel-track::before, .carousel-track::after{ content:""; flex:0 0 40%; }
+  @media (min-width:1024px){ .carousel-track::before, .carousel-track::after{ flex-basis: 34%; } }
   .svc-capsule{
     scroll-snap-align: center;
     flex: 0 0 78%; max-width: 300px; min-height: 300px;
@@ -383,6 +382,7 @@
   .carousel-arrow:hover{ transform: translateY(-50%) scale(1.08); border-color: rgba(230,197,148,0.85);
     box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), 0 0 38px rgba(230,197,148,0.5); }
   .carousel-arrow:active{ transform: translateY(-50%) scale(0.95); }
+  .carousel-arrow.is-disabled{ opacity:.28; pointer-events:none; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
   .carousel-prev{ left: -4px; }  .carousel-next{ right: -4px; }
   @media (min-width:768px){ .carousel-prev{ left: -20px; } .carousel-next{ right: -20px; } }
   @media (prefers-reduced-motion: reduce){ .svc-capsule{ transform:none !important; opacity:1 !important; } }
@@ -662,7 +662,7 @@
     <div class="svc-carousel relative fade-up d1">
       <div class="glass-floor" aria-hidden="true"></div>
 
-      <div id="svc-track" class="carousel-track no-scrollbar flex items-stretch gap-5 md:gap-7 overflow-x-auto snap-x snap-mandatory pt-3 pb-24">
+      <div id="svc-track" tabindex="0" role="group" aria-label="Carosello dei servizi" class="carousel-track no-scrollbar flex items-stretch gap-5 md:gap-7 overflow-x-auto snap-x snap-proximity pt-3 pb-24">
 
         <article class="svc-capsule glass relative p-7 md:p-8 flex flex-col">
           <span class="glass-pill absolute top-5 right-5 px-3 py-1 text-[10px] tracking-widest uppercase text-gold-champagne">Gesso · Resina · Bronzo</span>
@@ -1198,40 +1198,74 @@
     const track = document.getElementById('svc-track');
     if (!track) return;
     const caps = Array.from(track.querySelectorAll('.svc-capsule'));
+    if (!caps.length) return;
     const rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prev = document.querySelector('.carousel-prev');
+    const next = document.querySelector('.carousel-next');
+    let curIdx = 0;
+
+    // scrollLeft che centra la capsula i nel track, sempre entro i limiti
+    function offsetFor(i){
+      const c = caps[i];
+      if (!c) return 0;
+      const target = c.offsetLeft - (track.clientWidth - c.offsetWidth) / 2;
+      const max = track.scrollWidth - track.clientWidth;
+      return Math.max(0, Math.min(max, target));
+    }
+    function nearestIdx(){
+      const mid = track.scrollLeft + track.clientWidth / 2;
+      let best = 0, bestD = Infinity;
+      caps.forEach((c, i) => {
+        const cc = c.offsetLeft + c.offsetWidth / 2;
+        const d = Math.abs(cc - mid);
+        if (d < bestD) { bestD = d; best = i; }
+      });
+      return best;
+    }
+    function paintArrows(){
+      if (prev) prev.classList.toggle('is-disabled', curIdx <= 0);
+      if (next) next.classList.toggle('is-disabled', curIdx >= caps.length - 1);
+    }
     function update(){
-      const tr = track.getBoundingClientRect();
-      const cx = tr.left + tr.width / 2;
-      let best = null, bestD = Infinity;
+      const mid = track.scrollLeft + track.clientWidth / 2;
       caps.forEach(c => {
-        const r = c.getBoundingClientRect();
-        const d = (r.left + r.width / 2) - cx;
-        const nd = Math.max(-1, Math.min(1, d / (tr.width * 0.6)));
+        const cc = c.offsetLeft + c.offsetWidth / 2;
+        const nd = Math.max(-1, Math.min(1, (cc - mid) / (track.clientWidth * 0.62)));
         if (!rm) {
           c.style.transform = 'perspective(1600px) rotateY(' + (nd * -24).toFixed(2) + 'deg) scale(' + (1 - Math.abs(nd) * 0.15).toFixed(3) + ') translateZ(' + (-Math.abs(nd) * 90).toFixed(0) + 'px)';
           c.style.opacity = (1 - Math.abs(nd) * 0.5).toFixed(2);
           c.style.zIndex = String(100 - Math.round(Math.abs(nd) * 100));
         }
-        if (Math.abs(d) < bestD) { bestD = Math.abs(d); best = c; }
       });
-      caps.forEach(c => c.classList.toggle('is-center', c === best));
+      curIdx = nearestIdx();
+      caps.forEach((c, i) => c.classList.toggle('is-center', i === curIdx));
+      paintArrows();
     }
+    function goTo(i){
+      curIdx = Math.max(0, Math.min(caps.length - 1, i));
+      track.scrollTo({ left: offsetFor(curIdx), behavior: rm ? 'auto' : 'smooth' });
+      paintArrows();
+    }
+
     let ticking = false;
     track.addEventListener('scroll', () => {
       if (!ticking) { requestAnimationFrame(() => { update(); ticking = false; }); ticking = true; }
     }, { passive: true });
-    window.addEventListener('resize', update);
-    function stepPx(){
-      if (!caps[0]) return 320;
-      const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 24;
-      return caps[0].getBoundingClientRect().width + gap;
-    }
-    const prev = document.querySelector('.carousel-prev');
-    const next = document.querySelector('.carousel-next');
-    if (prev) prev.addEventListener('click', () => track.scrollBy({ left: -stepPx(), behavior: 'smooth' }));
-    if (next) next.addEventListener('click', () => track.scrollBy({ left: stepPx(), behavior: 'smooth' }));
-    // start on the second capsule so the coverflow reads immediately
-    requestAnimationFrame(() => { track.scrollLeft = Math.max(0, stepPx() * 0.6); update(); });
+    window.addEventListener('resize', () => { update(); });
+
+    if (prev) prev.addEventListener('click', () => goTo(curIdx - 1));
+    if (next) next.addEventListener('click', () => goTo(curIdx + 1));
+    track.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(curIdx - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goTo(curIdx + 1); }
+    });
+
+    // avvio: seconda capsula centrata così il coverflow si legge subito
+    requestAnimationFrame(() => {
+      track.scrollLeft = offsetFor(Math.min(1, caps.length - 1));
+      update();
+    });
+    window.addEventListener('load', update);
   })();
 
   const revealEls = Array.from(document.querySelectorAll('.fade-up'));
