@@ -1384,11 +1384,14 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(wrap.clientWidth, wrap.clientHeight);
     renderer.setClearColor(0x000000, 0);
+    if ('sRGBEncoding' in THREE) renderer.outputEncoding = THREE.sRGBEncoding;
+    if ('ACESFilmicToneMapping' in THREE) { renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15; }
 
-    scene.add(new THREE.AmbientLight(0xfff2dd, 0.6));
-    var key = new THREE.DirectionalLight(0xffe8bd, 1.15); key.position.set(2.5, 4, 3); scene.add(key);
-    var rim = new THREE.DirectionalLight(0xd4af37, 1.0); rim.position.set(-3, 1.5, -2.5); scene.add(rim);
-    var fill = new THREE.DirectionalLight(0x9fb4ff, 0.25); fill.position.set(0, -1.5, 2); scene.add(fill);
+    scene.add(new THREE.AmbientLight(0xfff2dd, 0.9));
+    scene.add(new THREE.HemisphereLight(0xffe9c8, 0x2a2620, 0.85));
+    var key = new THREE.DirectionalLight(0xffe8bd, 1.55); key.position.set(2.5, 4, 3); scene.add(key);
+    var rim = new THREE.DirectionalLight(0xd4af37, 1.25); rim.position.set(-3, 1.5, -2.5); scene.add(rim);
+    var fill = new THREE.DirectionalLight(0x9fb4ff, 0.4); fill.position.set(0, -1.5, 2); scene.add(fill);
 
     var statue = null;
 
@@ -1418,7 +1421,11 @@
       loader.parse(b64ToBuffer(STATUE_GLB_B64), '', function(gltf){
         statue = gltf.scene;
         statue.traverse(function(o){
-          if (o.isMesh) { o.material = new THREE.MeshStandardMaterial({ color: 0xEDE3D0, roughness: 0.6, metalness: 0.06 }); }
+          if (o.isMesh) {
+            if (o.geometry && !o.geometry.attributes.normal) { o.geometry.computeVertexNormals(); }
+            o.material = new THREE.MeshStandardMaterial({ color: 0xEDE3D0, roughness: 0.58, metalness: 0.05 });
+            o.castShadow = false; o.receiveShadow = false;
+          }
         });
         scene.add(statue);
         fitCameraToObject(statue);
