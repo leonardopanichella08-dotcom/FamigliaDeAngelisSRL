@@ -8,19 +8,23 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <script>
   tailwind.config = {
     theme: {
       extend: {
         colors: {
-          cinema: { black: '#0d0d0d', dark: '#141414', panel: '#1a1a1a', line: '#2b2b2b', gray: '#9a9a9a' },
-          gold: { DEFAULT: '#d4af37', dark: '#a9832a', light: '#e8cd7a', muted: '#C5A059' }
+          /* Cinematic Obsidian & Deep Charcoal */
+          cinema: { black: '#0A0A0C', dark: '#0E0E12', panel: '#121216', line: '#2b2b2b', gray: '#9a9a9a' },
+          /* Sculptural Amber & Champagne Gold */
+          gold: { DEFAULT: '#D4AF37', dark: '#a9832a', light: '#E6C594', muted: '#C5A059', champagne: '#E6C594' }
         },
         fontFamily: {
-          display: ['"Playfair Display"', 'serif'],
-          sans: ['Inter', 'sans-serif'],
+          display: ['"Cinzel"', '"Playfair Display"', 'serif'],
+          serif: ['"Playfair Display"', 'serif'],
+          sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', 'system-ui', 'sans-serif'],
         }
       }
     }
@@ -39,139 +43,200 @@
   .no-scrollbar{ scrollbar-width:none; -ms-overflow-style:none; }
   .no-scrollbar::-webkit-scrollbar{ display:none; }
 
-  .text-gradient-gold{
-    background: linear-gradient(90deg, #e8cd7a, #d4af37 45%, #a9832a);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 3px 14px rgba(0,0,0,0.65));
+  /* ==========================================================================
+     LIQUID GLASS DESIGN SYSTEM — visionOS glassmorphism
+     Obsidian ground · Champagne/Amber accents · translucent dark glass
+     ========================================================================== */
+  :root{
+    --obsidian:        #0A0A0C;
+    --charcoal:        #121216;
+    --amber:           #D4AF37;
+    --champagne:       #E6C594;
+    --glass-fill:      rgba(16, 16, 22, 0.65);
+    --glass-fill-soft: rgba(16, 16, 22, 0.42);
+    --glass-border:    0.5px solid rgba(230, 197, 148, 0.25);
+    --glass-blur:      blur(20px) saturate(150%);
+    --r-squircle:      28px;   /* super-ellipse-ish large radius */
+    --r-card:          22px;
+    --r-input:         16px;
+    --spring:          all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    --glow-amber:      0 0 0 1px rgba(230,197,148,0.35), 0 18px 50px -12px rgba(212,175,55,0.35);
   }
 
-  /* ============ TOCCO APPLE — pulsanti a pillola con rimbalzo morbido, tessere con angoli più organici ============ */
-  .btn-apple{
-    border-radius: 9999px;
-    transition: transform .45s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease, border-color .3s ease, box-shadow .3s ease;
+  body{ font-family: '"Plus Jakarta Sans"', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+
+  .text-gradient-gold{
+    background: linear-gradient(92deg, #F1E1BE, #E6C594 40%, #D4AF37 70%, #a9832a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 3px 16px rgba(0,0,0,0.7));
   }
-  .btn-apple:hover{ transform: translateY(-2px) scale(1.03); }
+
+  /* ---- Base glass surface -------------------------------------------------- */
+  .glass{
+    position: relative;
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: var(--glass-border);
+    border-radius: var(--r-squircle);
+    box-shadow:
+      0 24px 70px -18px rgba(0,0,0,0.65),
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      inset 0 -18px 30px -22px rgba(0,0,0,0.4);
+    text-shadow: 0 1px 10px rgba(0,0,0,0.55);
+    transition: var(--spring);
+  }
+  .glass-soft{ background: var(--glass-fill-soft); }
+  .glass-card{ border-radius: var(--r-card); }
+
+  /* specular top-edge highlight sweep */
+  .glass::after{
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 30%);
+    mix-blend-mode: screen; opacity:.8;
+  }
+
+  /* interactive lift + amber edge illumination */
+  .glass-hover{ transition: var(--spring); will-change: transform; }
+  .glass-hover:hover{
+    transform: translateY(-6px);
+    border-color: rgba(230,197,148,0.55);
+    box-shadow:
+      0 34px 90px -24px rgba(0,0,0,0.7),
+      0 0 0 1px rgba(230,197,148,0.30),
+      0 24px 60px -20px rgba(212,175,55,0.30),
+      inset 0 1px 0 rgba(255,255,255,0.14);
+  }
+
+  /* 3D parallax tilt (JS-driven via --rx / --ry custom props) */
+  .tilt{ transform-style: preserve-3d; transition: transform .18s ease-out, box-shadow .35s ease, border-color .35s ease; }
+  .tilt-inner{ transform: translateZ(40px); }
+
+  /* legacy aliases so existing markup keeps working */
+  .glass-panel{ position:relative; background:var(--glass-fill); -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur); border:var(--glass-border); border-radius:var(--r-squircle); box-shadow:0 24px 70px -18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.10); text-shadow:0 1px 10px rgba(0,0,0,0.55); }
+  .glass-solid{ position:relative; overflow:hidden; background:rgba(16,16,22,0.82); -webkit-backdrop-filter:blur(24px) saturate(150%); backdrop-filter:blur(24px) saturate(150%); border:var(--glass-border); border-radius:var(--r-squircle); box-shadow:0 30px 80px -20px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.10); text-shadow:0 1px 10px rgba(0,0,0,0.55); }
+
+  /* ---- Glowing CTA ------------------------------------------------------- */
+  .cta-glow{
+    position:relative; border-radius:9999px; isolation:isolate;
+    background: linear-gradient(180deg, #F1E1BE, #E6C594 45%, #D4AF37);
+    color:#12100A; font-weight:600; letter-spacing:.02em;
+    box-shadow: 0 10px 30px -6px rgba(212,175,55,0.55), inset 0 1px 0 rgba(255,255,255,0.6);
+    transition: var(--spring);
+  }
+  .cta-glow::before{
+    content:""; position:absolute; inset:-2px; border-radius:inherit; z-index:-1;
+    background: radial-gradient(60% 120% at 50% 0%, rgba(230,197,148,0.7), transparent 70%);
+    filter: blur(10px); opacity:.7; transition: var(--spring);
+  }
+  .cta-glow:hover{ transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 44px -6px rgba(212,175,55,0.7), inset 0 1px 0 rgba(255,255,255,0.7); }
+  .cta-glow:hover::before{ opacity:1; inset:-4px; }
+  .cta-glow:active{ transform: scale(0.98); }
+
+  .cta-ghost{
+    border-radius:9999px; border:0.5px solid rgba(230,197,148,0.4); color:var(--champagne);
+    background: rgba(16,16,22,0.35);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    transition: var(--spring);
+  }
+  .cta-ghost:hover{ transform: translateY(-2px); border-color: rgba(230,197,148,0.8); color:#F1E1BE; box-shadow: 0 12px 34px -12px rgba(212,175,55,0.4); }
+
+  /* ---- Glass pill (filters / switchers) -------------------------------- */
+  .glass-pill{
+    position:relative;
+    background: rgba(16,16,22,0.5);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    border: var(--glass-border);
+    border-radius: 9999px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .pill-item{
+    border-radius:9999px; color:#b9b4ab; white-space:nowrap;
+    transition: var(--spring); border:0.5px solid transparent;
+  }
+  .pill-item:hover{ color:#F1E1BE; }
+  .pill-item.is-active{
+    color:#12100A;
+    background: linear-gradient(180deg, #F1E1BE, #E6C594 60%, #D4AF37);
+    box-shadow: 0 0 18px rgba(230,197,148,0.55), inset 0 1px 0 rgba(255,255,255,0.6);
+    border-color: rgba(255,255,255,0.35);
+  }
+
+  /* ---- Legacy button aliases ----------------------------------------- */
+  .btn-apple{ border-radius:9999px; transition: var(--spring); }
+  .btn-apple:hover{ transform: translateY(-2px) scale(1.02); }
   .btn-apple:active{ transform: scale(0.97); }
   .btn-glossy{ position:relative; overflow:hidden; }
-  .btn-glossy::before{
-    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-    background: linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0) 55%);
-  }
-  .icon-tile{
-    border-radius: 16px;
-    transition: transform .45s cubic-bezier(.34,1.56,.64,1), background-color .3s ease, color .3s ease;
-  }
+  .btn-glossy::before{ content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,0.42), rgba(255,255,255,0) 55%); }
+  .icon-tile{ border-radius:16px; transition: var(--spring); }
   .group:hover .icon-tile{ transform: scale(1.08) rotate(-2deg); }
 
-  /* ============ ORO — tinta uniforme per i PNG decorativi trasparenti ============ */
-  .gold-tint{
-    filter: brightness(0) saturate(100%) invert(70%) sepia(45%) saturate(500%) hue-rotate(0deg) brightness(95%) contrast(92%)
-            drop-shadow(0 0 22px rgba(212,175,55,0.4));
-  }
-  .gold-tint-soft{
-    filter: brightness(0) saturate(100%) invert(70%) sepia(45%) saturate(500%) hue-rotate(0deg) brightness(95%) contrast(92%);
-  }
-  .meander-strip{
-    height: 30px;
-    background-image: url('https://commons.wikimedia.org/wiki/Special:FilePath/Meander3.png?width=1200');
-    background-repeat: repeat-x;
-    background-size: auto 100%;
-    background-position: center;
-    opacity: .3;
-  }
+  .gold-tint{ filter: brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(560%) hue-rotate(2deg) brightness(98%) contrast(92%) drop-shadow(0 0 22px rgba(230,197,148,0.4)); }
+  .gold-tint-soft{ filter: brightness(0) saturate(100%) invert(78%) sepia(28%) saturate(560%) hue-rotate(2deg) brightness(98%) contrast(92%); }
 
-  /* ============ SCROLL REVEAL — sobrio, un solo pattern ============ */
-  .fade-up{ opacity:0; transform: translateY(20px); transition: opacity .8s ease, transform .8s ease; }
+  /* ============ SCROLL REVEAL ============ */
+  .fade-up{ opacity:0; transform: translateY(24px); transition: opacity .8s cubic-bezier(0.16,1,0.3,1), transform .8s cubic-bezier(0.16,1,0.3,1); }
   .fade-up.in-view{ opacity:1; transform: translateY(0); }
   .d1{ transition-delay:.06s } .d2{ transition-delay:.12s } .d3{ transition-delay:.18s }
   .d4{ transition-delay:.24s } .d5{ transition-delay:.3s } .d6{ transition-delay:.36s }
   .d7{ transition-delay:.42s } .d8{ transition-delay:.48s } .d9{ transition-delay:.54s }
 
-  /* ============ PHOTO FRAME — riquadro fotografico standard, angoli arrotondati uniformi ============ */
+  /* ============ PHOTO FRAME ============ */
   .photo-frame{
-    position:relative; overflow:hidden; background:#151310;
-    border: 1px solid rgba(212,175,55,0.16);
-    border-radius: 18px;
-    transition: border-color .4s ease, box-shadow .5s ease;
+    position:relative; overflow:hidden; background:#0E0E12;
+    border: var(--glass-border);
+    border-radius: var(--r-card);
+    transition: var(--spring);
   }
-  .photo-frame:hover{ border-color: rgba(212,175,55,0.5); box-shadow: 0 18px 44px -18px rgba(212,175,55,0.4); }
+  .photo-frame:hover{ border-color: rgba(230,197,148,0.55); box-shadow: 0 26px 60px -22px rgba(212,175,55,0.4); }
   .photo-frame img{
     position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-    transition: transform .9s cubic-bezier(.34,1.56,.64,1), filter .5s ease;
-    filter: saturate(0.92) contrast(1.04);
+    transition: transform 1s cubic-bezier(0.16,1,0.3,1), filter .6s ease;
+    filter: saturate(0.9) contrast(1.05) brightness(0.94);
   }
-  .photo-frame:hover img{ transform: scale(1.045); }
+  .photo-frame:hover img{ transform: scale(1.05); filter: saturate(1) contrast(1.05) brightness(1); }
   .photo-frame .frame-overlay{
     position:absolute; inset:0; pointer-events:none;
-    background: linear-gradient(to top, rgba(6,5,4,0.92) 0%, rgba(6,5,4,0.45) 38%, rgba(6,5,4,0.05) 62%);
+    background: linear-gradient(to top, rgba(6,5,7,0.94) 0%, rgba(6,5,7,0.42) 40%, rgba(6,5,7,0.04) 66%);
   }
   .photo-frame .frame-caption{
-    position:absolute; left:0; right:0; bottom:0; padding:1.1rem 1.25rem 1rem;
-    background: rgba(255,255,255,0.07);
-    -webkit-backdrop-filter: blur(14px) saturate(180%);
-    backdrop-filter: blur(14px) saturate(180%);
-    border-top: 1px solid rgba(212,175,55,0.28);
-    text-shadow: 0 2px 8px rgba(0,0,0,0.75), 0 1px 3px rgba(0,0,0,0.6);
+    position:absolute; left:0; right:0; bottom:0; padding:1.15rem 1.3rem 1.05rem;
+    background: rgba(12,12,16,0.5);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+    border-top: 0.5px solid rgba(230,197,148,0.3);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
   }
   .photo-frame .frame-tag{
-    position:absolute; top:1rem; left:1rem; z-index:2; border-radius: 9999px;
-    background: rgba(6,5,4,0.75) !important;
+    position:absolute; top:0.9rem; left:0.9rem; z-index:2; border-radius: 9999px;
+    background: rgba(10,10,12,0.7) !important;
+    border: 0.5px solid rgba(230,197,148,0.35);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   }
-
-  /* ============ LIQUID GLASS — stile Apple: vetro trasparente, rifrazione, bordo luminoso ============ */
-  .glass-panel, .glass-solid, .glass-card{
-    text-shadow: 0 2px 10px rgba(0,0,0,0.65), 0 1px 3px rgba(0,0,0,0.5);
-  }
-  .bg-gold, .text-cinema-black{ text-shadow: none; }
-
-  .glass-panel{
-    position:relative; overflow:hidden; border-radius: 28px;
-    background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03) 60%, rgba(212,175,55,0.05));
-    -webkit-backdrop-filter: blur(26px) saturate(160%);
-    backdrop-filter: blur(26px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.3);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -14px 26px -18px rgba(0,0,0,0.3);
-  }
-  .glass-pill{
-    position:relative; overflow:hidden;
-    background: rgba(255,255,255,0.09);
-    -webkit-backdrop-filter: blur(18px) saturate(160%);
-    backdrop-filter: blur(18px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.26);
-    border-radius: 9999px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -6px 14px -10px rgba(0,0,0,0.25);
-  }
-  .glass-solid{
-    position:relative; overflow:hidden; border-radius: 28px;
-    background: linear-gradient(165deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02) 60%, rgba(212,175,55,0.04));
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
-    backdrop-filter: blur(24px) saturate(150%);
-    border: 1px solid rgba(255,255,255,0.28);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -14px 26px -18px rgba(0,0,0,0.28);
-  }
-  .glass-card{
-    position:relative; overflow:hidden; border-radius: 20px;
-    background: linear-gradient(160deg, rgba(255,255,255,0.13), rgba(255,255,255,0.02) 60%);
-    -webkit-backdrop-filter: blur(22px) saturate(160%);
-    backdrop-filter: blur(22px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.26);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -12px 22px -16px rgba(0,0,0,0.25);
-    transition: border-color .5s ease, transform .6s cubic-bezier(.34,1.56,.64,1), box-shadow .5s ease;
-  }
-  .glass-card:hover{
-    border-color: rgba(212,175,55,0.6); transform: translateY(-6px);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -12px 22px -16px rgba(0,0,0,0.25), 0 22px 50px -18px rgba(212,175,55,0.5);
+  /* liquid floor reflection for portfolio capsules */
+  .reflect::before{
+    content:""; position:absolute; left:6%; right:6%; bottom:-14px; height:26px; border-radius:50%;
+    background: radial-gradient(ellipse at center, rgba(230,197,148,0.18), transparent 70%);
+    filter: blur(6px); pointer-events:none;
   }
 
   /* ============ LIQUID LIGHT — UNICO sfondo fisso, continuo dall'alto in basso su tutto il sito ============ */
   .bg-ambient{
     position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
-    background:#0d0d0d;
+    background:
+      radial-gradient(120% 80% at 15% 0%, #121216 0%, #0A0A0C 60%),
+      #0A0A0C;
   }
-  .liquid-blob{ position:absolute; border-radius:50%; filter: blur(80px); will-change: transform; }
-  .liquid-blob.gold{ background: radial-gradient(circle, rgba(212,175,55,0.4), transparent 72%); }
-  .liquid-blob.warm{ background: radial-gradient(circle, rgba(169,131,42,0.32), transparent 72%); }
-  .liquid-blob.pale{ background: radial-gradient(circle, rgba(232,205,122,0.28), transparent 72%); }
+  .bg-ambient::after{
+    content:""; position:absolute; inset:0;
+    background-image: radial-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 3px 3px; opacity:.6;
+  }
+  .liquid-blob{ position:absolute; border-radius:50%; filter: blur(90px); will-change: transform; }
+  .liquid-blob.gold{ background: radial-gradient(circle, rgba(212,175,55,0.34), transparent 72%); }
+  .liquid-blob.warm{ background: radial-gradient(circle, rgba(230,197,148,0.22), transparent 72%); }
+  .liquid-blob.pale{ background: radial-gradient(circle, rgba(241,225,190,0.20), transparent 72%); }
   @keyframes liquidDrift1{
     0%,100%{ transform: translate(0,0) scale(1); }
     33%{ transform: translate(10%,-13%) scale(1.15); }
@@ -255,6 +320,48 @@
   .marquee-wrap:hover .marquee-track{ animation-play-state: paused; }
   @keyframes marquee{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
   @media (prefers-reduced-motion: reduce){ .marquee-track{ animation: none; } }
+
+  /* ============ HERITAGE PILLAR CARDS ============ */
+  .pillar-card::after{ content:""; position:absolute; inset:0; z-index:0; border-radius:inherit;
+    background: linear-gradient(to top, rgba(10,10,12,0.94) 0%, rgba(10,10,12,0.45) 55%, rgba(10,10,12,0.15) 100%); }
+  .pillar-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0;
+    filter: blur(16px) saturate(0.7) brightness(0.32); transform: scale(1.12);
+    transition: filter .5s cubic-bezier(0.16,1,0.3,1), transform .6s cubic-bezier(0.16,1,0.3,1); }
+  .pillar-card:hover .pillar-bg{ filter: blur(2px) saturate(1) brightness(0.55); transform: scale(1.04); }
+  .pillar-card > .tilt-inner{ z-index:1; }
+
+  /* ============ 3D TILT — guidato da JS via --rx / --ry ============ */
+  .tilt{ transform: perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)); }
+
+  /* ============ FORM FIELDS — squircle glass inputs ============ */
+  .fld{
+    background: rgba(10,10,12,0.55);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    border: 0.5px solid rgba(230,197,148,0.22);
+    border-radius: var(--r-input);
+    color:#fff; padding: 0.7rem 0.9rem; font-size: 0.875rem;
+    outline: none; transition: var(--spring);
+  }
+  .fld::placeholder{ color:#6b6b6b; }
+  .fld:focus{ border-color: rgba(230,197,148,0.75); box-shadow: 0 0 0 3px rgba(230,197,148,0.12); background: rgba(10,10,12,0.7); }
+  select.fld option{ background:#121216; color:#fff; }
+  .switch-group{ border-radius: 9999px; }
+  @media (max-width:480px){ .switch-group{ border-radius: 18px; } }
+
+  /* ============ LOCATION MAP WIDGET (stilizzata, dark) ============ */
+  .loc-map{
+    background:
+      linear-gradient(rgba(230,197,148,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(230,197,148,0.05) 1px, transparent 1px),
+      radial-gradient(120% 90% at 60% 20%, #16161c, #0A0A0C 75%);
+    background-size: 34px 34px, 34px 34px, 100% 100%;
+  }
+  .loc-pin{ position:absolute; top:38%; left:56%; width:14px; height:14px; border-radius:50%;
+    background:#E6C594; box-shadow: 0 0 0 6px rgba(230,197,148,0.18), 0 0 26px 6px rgba(212,175,55,0.6); }
+  .loc-pin::after{ content:""; position:absolute; inset:-14px; border-radius:50%; border:1px solid rgba(230,197,148,0.4);
+    animation: pinPulse 2.6s ease-out infinite; }
+  @keyframes pinPulse{ 0%{ transform:scale(0.5); opacity:.9 } 100%{ transform:scale(1.6); opacity:0 } }
+  @media (prefers-reduced-motion: reduce){ .loc-pin::after{ animation:none; } }
 </style>
 </head>
 
@@ -269,112 +376,113 @@
   <div class="liquid-blob warm" style="width:35vw;max-width:380px;height:35vw;max-height:380px;top:60%;left:40%;"></div>
 </div>
 
-<!-- ============ HEADER / NAVBAR ============ -->
-<header id="site-header" class="fixed top-0 inset-x-0 z-50 backdrop-blur-md bg-cinema-black/85 transition-all">
-  <div class="max-w-7xl mx-auto px-5 md:px-8">
-    <div class="flex items-center justify-between h-20">
-      <a href="#top" class="flex flex-col leading-none group">
-        <span class="font-display text-lg md:text-xl tracking-[0.15em] text-white group-hover:text-gold transition-colors">FAMIGLIA DE ANGELIS</span>
-        <span class="text-[10px] md:text-xs tracking-[0.3em] text-gold-muted mt-1">CINESCULTURA DAL 1919</span>
-      </a>
+<!-- ============ LIQUID NAVIGATION DOCK — floating glass, macOS-inspired ============ -->
+<header id="site-header" class="fixed top-3 md:top-5 inset-x-0 z-50 px-4 flex justify-center transition-all">
+  <div class="glass w-full max-w-5xl !rounded-full px-3 md:px-4 py-2 flex items-center justify-between gap-3">
+    <a href="#top" class="flex items-center gap-2.5 pl-2 group shrink-0">
+      <span class="grid place-items-center h-8 w-8 rounded-full text-cinema-black font-display text-sm font-bold"
+            style="background:linear-gradient(150deg,#F1E1BE,#D4AF37);box-shadow:0 0 16px rgba(230,197,148,0.5)">DA</span>
+      <span class="hidden sm:flex flex-col leading-none">
+        <span class="font-display text-[13px] tracking-[0.14em] text-white group-hover:text-gold transition-colors">FAMIGLIA DE ANGELIS</span>
+        <span class="text-[9px] tracking-[0.28em] text-gold-champagne/80 mt-0.5">CINESCULTURA DAL 1919</span>
+      </span>
+    </a>
 
-      <nav class="hidden lg:flex items-center gap-9 text-sm tracking-wide text-gray-300">
-        <a href="#chi-siamo" class="hover:text-gold transition-colors">Chi Siamo</a>
-        <a href="#servizi" class="hover:text-gold transition-colors">Servizi</a>
-        <a href="#filmografia" class="hover:text-gold transition-colors">Portfolio / Filmografia</a>
-        <a href="#materiali" class="hover:text-gold transition-colors">Materiali</a>
-        <a href="#magazine" class="hover:text-gold transition-colors">Magazine</a>
-        <a href="#contatti" class="hover:text-gold transition-colors">Contatti</a>
-      </nav>
+    <nav class="hidden lg:flex items-center gap-1 text-[13px] tracking-wide">
+      <a href="#chi-siamo"   class="pill-item px-3.5 py-2 text-gray-300 hover:bg-white/5">Chi Siamo</a>
+      <a href="#filmografia" class="pill-item px-3.5 py-2 text-gray-300 hover:bg-white/5">Portfolio</a>
+      <a href="#servizi"     class="pill-item px-3.5 py-2 text-gray-300 hover:bg-white/5">Servizi</a>
+      <a href="#materiali"   class="pill-item px-3.5 py-2 text-gray-300 hover:bg-white/5">Materiali</a>
+      <a href="#magazine"    class="pill-item px-3.5 py-2 text-gray-300 hover:bg-white/5">Magazine</a>
+      <a href="#contatti"    class="pill-item px-3.5 py-2 text-gray-300 hover:bg-white/5">Contatti</a>
+    </nav>
 
-      <div class="hidden lg:block">
-        <a href="#richiedi-progetto" class="btn-apple inline-flex items-center gap-2 border border-gold text-gold px-5 py-2.5 text-sm tracking-wide font-medium hover:bg-gold hover:text-cinema-black">
-          Richiedi un Progetto
-        </a>
-      </div>
+    <a href="#richiedi-progetto" class="hidden md:inline-flex cta-glow items-center gap-2 px-5 py-2.5 text-[13px] shrink-0">
+      Richiedi un Progetto
+    </a>
 
-      <button id="menu-toggle" aria-label="Apri menu" class="lg:hidden text-white p-2">
-        <svg id="icon-open" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
-        </svg>
-        <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+    <button id="menu-toggle" aria-label="Apri menu" class="lg:hidden text-white p-2 mr-1">
+      <svg id="icon-open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+      </svg>
+      <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
   </div>
 
-  <div id="mobile-menu" class="hidden lg:hidden bg-cinema-black">
-    <nav class="flex flex-col px-6 py-6 gap-5 text-base text-gray-200">
-      <a href="#chi-siamo" class="mobile-link hover:text-gold">Chi Siamo</a>
-      <a href="#servizi" class="mobile-link hover:text-gold">Servizi</a>
-      <a href="#filmografia" class="mobile-link hover:text-gold">Portfolio / Filmografia</a>
-      <a href="#materiali" class="mobile-link hover:text-gold">Materiali</a>
-      <a href="#magazine" class="mobile-link hover:text-gold">Magazine</a>
-      <a href="#contatti" class="mobile-link hover:text-gold">Contatti</a>
-      <a href="#richiedi-progetto" class="mobile-link btn-apple mt-2 inline-flex justify-center items-center border border-gold text-gold px-5 py-3 text-sm tracking-wide font-medium">Richiedi un Progetto</a>
+  <div id="mobile-menu" class="glass hidden lg:hidden absolute top-full mt-2 inset-x-4 !rounded-3xl p-4">
+    <nav class="flex flex-col gap-1 text-base text-gray-200">
+      <a href="#chi-siamo"   class="mobile-link pill-item px-4 py-3 hover:bg-white/5">Chi Siamo</a>
+      <a href="#filmografia" class="mobile-link pill-item px-4 py-3 hover:bg-white/5">Portfolio</a>
+      <a href="#servizi"     class="mobile-link pill-item px-4 py-3 hover:bg-white/5">Servizi</a>
+      <a href="#materiali"   class="mobile-link pill-item px-4 py-3 hover:bg-white/5">Materiali</a>
+      <a href="#magazine"    class="mobile-link pill-item px-4 py-3 hover:bg-white/5">Magazine</a>
+      <a href="#contatti"    class="mobile-link pill-item px-4 py-3 hover:bg-white/5">Contatti</a>
+      <a href="#richiedi-progetto" class="mobile-link cta-glow mt-2 inline-flex justify-center items-center px-5 py-3.5 text-sm">Richiedi un Progetto</a>
     </nav>
   </div>
 </header>
 
-<!-- ============ HERO — foto piena, atmosfera reale ============ -->
-<section id="top" class="atmo atmo-scrim-dark relative h-[92vh] min-h-[640px] flex items-end overflow-hidden">
+<!-- ============ HERO — vessel di vetro centrale su fondale cinematografico ============ -->
+<section id="top" class="atmo atmo-scrim-dark relative min-h-[100svh] flex items-center justify-center overflow-hidden py-28">
   <div class="atmo-parallax" data-parallax="0.12">
     <img class="atmo-img hero-photo" src="https://commons.wikimedia.org/wiki/Special:FilePath/Roman_Forum_looking_East_panorama.jpg?width=1920"
-         alt="Foro Romano — colonne e rovine classiche, Roma">
+         alt="Textures scultoree e luce di studio — Foro Romano, Roma">
   </div>
-  <div class="absolute inset-0" style="background:linear-gradient(0deg, rgba(10,9,7,0.96) 0%, rgba(10,9,7,0.35) 55%, rgba(10,9,7,0.55) 100%);"></div>
+  <div class="absolute inset-0" style="background:radial-gradient(120% 90% at 50% 60%, rgba(10,10,12,0.55) 0%, rgba(10,10,12,0.9) 70%, #0A0A0C 100%);"></div>
 
   <div class="hero-life" aria-hidden="true">
-    <div class="light-flicker" style="width:260px;height:260px;top:8%;left:12%;"></div>
-    <div class="light-flicker" style="width:220px;height:220px;top:14%;left:62%;"></div>
-    <div class="light-flicker" style="width:200px;height:200px;top:5%;left:38%;"></div>
+    <div class="light-flicker" style="width:320px;height:320px;top:6%;left:10%;"></div>
+    <div class="light-flicker" style="width:260px;height:260px;top:12%;left:64%;"></div>
+    <div class="light-flicker" style="width:220px;height:220px;top:60%;left:44%;"></div>
     <div class="figure-drift"></div>
     <div class="figure-drift"></div>
     <div class="figure-drift"></div>
   </div>
 
-  <div class="relative z-10 w-full max-w-7xl mx-auto px-5 md:px-8 pb-28 md:pb-32">
-    <div class="fade-up in-view max-w-2xl">
-      <p class="uppercase tracking-[0.35em] text-xs text-gold-muted mb-6">Studi di Cinecittà — Roma</p>
-      <h1 class="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] mb-6">
+  <div class="relative z-10 w-full max-w-2xl mx-auto px-5">
+    <div class="glass fade-up in-view text-center px-7 py-10 md:px-12 md:py-14">
+      <span class="inline-flex items-center gap-2 glass-pill px-4 py-1.5 text-[11px] tracking-[0.22em] uppercase text-gold-champagne mb-7">
+        <span aria-hidden="true">✦</span> Cinecittà • Dal 1919
+      </span>
+      <h1 class="font-display text-3xl sm:text-5xl md:text-[3.4rem] font-bold leading-[1.05] mb-6" style="text-wrap:balance">
         DIAMO FORMA<br class="hidden sm:block"> ALL'<span class="text-gradient-gold">IMMAGINAZIONE</span>.
       </h1>
-      <p class="text-gray-300 text-base md:text-lg leading-relaxed max-w-xl mb-9">
+      <p class="text-gray-300 text-[15px] md:text-base leading-relaxed max-w-lg mx-auto mb-9">
         Da oltre un secolo realizziamo calchi, statue e scenografie per i capolavori del cinema italiano e internazionale negli Studi di Cinecittà.
       </p>
-
-      <div class="flex flex-col sm:flex-row gap-4">
-        <a href="#richiedi-progetto" class="btn-apple btn-glossy inline-flex justify-center items-center gap-2 bg-gold text-cinema-black font-semibold px-7 py-3.5 tracking-wide hover:bg-gold-light">
-          Racconta il tuo progetto
-        </a>
-        <a href="#filmografia" class="btn-apple inline-flex justify-center items-center gap-2 border border-white/30 text-white px-7 py-3.5 tracking-wide hover:border-gold hover:text-gold">
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="#filmografia" class="cta-ghost inline-flex justify-center items-center gap-2 px-7 py-3.5 text-sm font-medium">
           Esplora la Filmografia
+        </a>
+        <a href="#richiedi-progetto" class="cta-glow inline-flex justify-center items-center gap-2 px-7 py-3.5 text-sm">
+          Racconta il tuo progetto
         </a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ STATISTICHE — pannello in vetro fluttuante sull'hero ============ -->
+<!-- ============ STATISTICHE — strip di vetro fluttuante ============ -->
 <section class="relative z-10">
-  <div class="max-w-7xl mx-auto px-5 md:px-8 -mt-16 md:-mt-20">
-    <div class="glass-panel grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gold/15">
-      <div class="fade-up d1 py-9 px-6 text-center sm:text-left">
-        <p class="font-display text-3xl md:text-4xl text-gold stat-number" data-target="100" data-suffix="+">0</p>
-        <p class="text-xs text-gray-400 mt-2 leading-snug">Anni di Attività<br>(Dal 1919)</p>
+  <div class="max-w-5xl mx-auto px-5 md:px-8 -mt-10 md:-mt-14">
+    <div class="glass grid grid-cols-2 sm:grid-cols-4">
+      <div class="fade-up d1 py-8 px-6 text-center border-b sm:border-b-0 sm:border-r border-gold-champagne/10">
+        <p class="font-display text-3xl md:text-4xl text-gold-champagne stat-number" data-target="100" data-suffix="+">0</p>
+        <p class="text-[11px] text-gray-400 mt-2 leading-snug tracking-wide">Anni di Attività<br>(Dal 1919)</p>
       </div>
-      <div class="fade-up d2 py-9 px-6 text-center sm:text-left">
-        <p class="font-display text-3xl md:text-4xl text-gold stat-number" data-target="4" data-suffix="">0</p>
-        <p class="text-xs text-gray-400 mt-2 leading-snug">Generazioni<br>di Scultori</p>
+      <div class="fade-up d2 py-8 px-6 text-center border-b sm:border-b-0 sm:border-r border-gold-champagne/10">
+        <p class="font-display text-3xl md:text-4xl text-gold-champagne stat-number" data-target="4" data-suffix="">0</p>
+        <p class="text-[11px] text-gray-400 mt-2 leading-snug tracking-wide">Generazioni<br>di Scultori</p>
       </div>
-      <div class="fade-up d3 py-9 px-6 text-center sm:text-left">
-        <p class="font-display text-3xl md:text-4xl text-gold stat-number" data-target="20" data-suffix="+">0</p>
-        <p class="text-xs text-gray-400 mt-2 leading-snug">Grandi Produzioni<br>Internazionali</p>
+      <div class="fade-up d3 py-8 px-6 text-center sm:border-r border-gold-champagne/10">
+        <p class="font-display text-3xl md:text-4xl text-gold-champagne stat-number" data-target="20" data-suffix="+">0</p>
+        <p class="text-[11px] text-gray-400 mt-2 leading-snug tracking-wide">Grandi Produzioni<br>Internazionali</p>
       </div>
-      <div class="fade-up d4 py-9 px-6 text-center sm:text-left">
-        <p class="font-display text-3xl md:text-4xl text-gold stat-number" data-target="300" data-suffix="+">0</p>
-        <p class="text-xs text-gray-400 mt-2 leading-snug">Opere in Mostre<br>Nazionali</p>
+      <div class="fade-up d4 py-8 px-6 text-center">
+        <p class="font-display text-3xl md:text-4xl text-gold-champagne stat-number" data-target="300" data-suffix="+">0</p>
+        <p class="text-[11px] text-gray-400 mt-2 leading-snug tracking-wide">Opere in Mostre<br>Nazionali</p>
       </div>
     </div>
   </div>
@@ -394,80 +502,95 @@
   </div>
 </section>
 
-<!-- ============ CHI SIAMO ============ -->
-<section id="chi-siamo" class="relative py-24 md:py-32 overflow-hidden">
-  <div class="relative max-w-7xl mx-auto px-5 md:px-8 grid lg:grid-cols-2 gap-16 items-center">
-    <div class="order-2 lg:order-1 grid grid-cols-2 gap-4 fade-up">
-      <div class="photo-frame aspect-[3/4]">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/E_Fremiet_vers_1902_Dornac.jpg?width=900"
-             alt="Scultore nel proprio atelier, primi del Novecento" style="filter:grayscale(0.55) saturate(0.85) contrast(1.05);">
-        <div class="frame-overlay"></div>
-        <div class="frame-caption">
-          <p class="text-xs text-gray-300">Prima generazione<br><span class="text-gold-muted">Roma, primi del '900</span></p>
-        </div>
-      </div>
-      <div class="photo-frame aspect-[3/4] mt-8">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Cinecitta_studios_rome_italy_entrance.jpg?width=900"
-             alt="Ingresso storico degli Studi di Cinecittà, Roma">
-        <div class="frame-overlay"></div>
-        <div class="frame-caption">
-          <p class="text-xs text-gray-300">Laboratorio oggi<br><span class="text-gold-muted">IV generazione</span></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="order-1 lg:order-2 fade-up">
-      <p class="uppercase tracking-[0.3em] text-xs text-gold-muted mb-4">Chi Siamo</p>
-      <h2 class="font-display text-3xl md:text-4xl font-semibold mb-6 leading-tight">
+<!-- ============ CHI SIAMO / EREDITÀ — griglia 3 card liquid glass con tilt 3D ============ -->
+<section id="chi-siamo" class="relative py-28 md:py-36 overflow-hidden">
+  <div class="relative max-w-6xl mx-auto px-5 md:px-8">
+    <div class="max-w-2xl fade-up mb-14">
+      <p class="uppercase tracking-[0.3em] text-[11px] text-gold-champagne mb-4">Chi Siamo</p>
+      <h2 class="font-display text-3xl md:text-4xl font-bold mb-6 leading-tight">
         L'eredità della <span class="text-gradient-gold">quarta generazione</span>
       </h2>
-      <p class="text-gray-400 leading-relaxed mb-5">
+      <p class="text-gray-400 leading-relaxed mb-4">
         Dal 1919, la Famiglia De Angelis tramanda un mestiere raro: la scultura scenografica applicata al cinema. Quattro generazioni si sono succedute nello stesso laboratorio, negli Studi di Cinecittà, portando avanti una tradizione artigianale che ha attraversato la storia del cinema italiano e internazionale.
       </p>
-      <p class="text-gray-400 leading-relaxed mb-9">
+      <p class="text-gray-400 leading-relaxed">
         Oggi il laboratorio unisce le tecniche classiche della scultura — modellazione, formatura, calco — alle esigenze contemporanee dell'industria audiovisiva, lavorando fianco a fianco con scenografi, art director e produzioni di tutto il mondo.
       </p>
+    </div>
 
-      <div class="space-y-5">
-        <div class="flex gap-4 fade-up">
-          <div class="mt-1 h-9 w-9 shrink-0 rounded-xl flex items-center justify-center border border-gold/40 text-gold text-sm">01</div>
-          <div>
-            <p class="font-medium text-white">Artigianato classico</p>
-            <p class="text-sm text-gray-500">Tecniche tramandate da oltre 100 anni, eseguite interamente a mano.</p>
-          </div>
-        </div>
-        <div class="flex gap-4 fade-up d2">
-          <div class="mt-1 h-9 w-9 shrink-0 rounded-xl flex items-center justify-center border border-gold/40 text-gold text-sm">02</div>
-          <div>
-            <p class="font-medium text-white">Industria dell'audiovisivo</p>
-            <p class="text-sm text-gray-500">Tempistiche e standard produttivi pensati per set e produzioni internazionali.</p>
-          </div>
+    <div class="grid md:grid-cols-3 gap-5 md:gap-6" style="perspective:1200px">
+
+      <div class="pillar-card glass glass-card tilt glass-hover fade-up d1 relative overflow-hidden p-7 min-h-[280px] flex flex-col justify-end">
+        <img class="pillar-bg" src="https://commons.wikimedia.org/wiki/Special:FilePath/E_Fremiet_vers_1902_Dornac.jpg?width=900" alt="" aria-hidden="true">
+        <div class="tilt-inner relative">
+          <span class="font-display text-gold-champagne/70 text-sm tracking-[0.2em]">01</span>
+          <h3 class="font-display text-xl mt-1 mb-2">100+ Anni di Storia</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Artigianato classico, tecniche tramandate da oltre 100 anni ed eseguite interamente a mano — dal 1919, sempre negli stessi laboratori.</p>
         </div>
       </div>
+
+      <div class="pillar-card glass glass-card tilt glass-hover fade-up d2 relative overflow-hidden p-7 min-h-[280px] flex flex-col justify-end">
+        <img class="pillar-bg" src="https://commons.wikimedia.org/wiki/Special:FilePath/Cinecitta_studios_rome_italy_entrance.jpg?width=900" alt="" aria-hidden="true">
+        <div class="tilt-inner relative">
+          <span class="font-display text-gold-champagne/70 text-sm tracking-[0.2em]">02</span>
+          <h3 class="font-display text-xl mt-1 mb-2">Scenografia &amp; Cinema</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Tempistiche e standard dell'industria audiovisiva: calchi, statue e set per produzioni cinematografiche e TV, italiane e internazionali.</p>
+        </div>
+      </div>
+
+      <div class="pillar-card glass glass-card tilt glass-hover fade-up d3 relative overflow-hidden p-7 min-h-[280px] flex flex-col justify-end">
+        <img class="pillar-bg" src="https://commons.wikimedia.org/wiki/Special:FilePath/Museo_civico_archeologico_di_Bologna_gipsoteca.JPG?width=900" alt="" aria-hidden="true">
+        <div class="tilt-inner relative">
+          <span class="font-display text-gold-champagne/70 text-sm tracking-[0.2em]">03</span>
+          <h3 class="font-display text-xl mt-1 mb-2">Interior Design &amp; Arte</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Opere su misura per studi di interior design ed eventi, restauro artistico e commissioni per musei, collezionisti e privati.</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- ============ CITAZIONE — statua 3D che ruota con lo scroll, nessuno sfondo dietro ============ -->
+<!-- ============ SOCIAL & LEGACY WALL — bento grid di vetro + statua 3D che ruota con lo scroll ============ -->
 <section class="relative py-28 md:py-36 overflow-hidden">
-  <div class="relative max-w-5xl mx-auto px-5 md:px-8 grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-    <div class="fade-up order-2 md:order-1">
-      <div id="statue-wrap" class="relative w-full h-[340px] sm:h-[420px] md:h-[500px]">
-        <canvas id="statue-canvas" class="w-full h-full block" aria-hidden="true"></canvas>
-        <p id="statue-fallback" class="hidden absolute inset-0 items-center justify-center text-xs text-gray-600 uppercase tracking-widest">Discobolo — scultura in 3D</p>
+  <div class="relative max-w-6xl mx-auto px-5 md:px-8">
+    <div class="grid md:grid-cols-3 md:grid-rows-2 gap-5 md:gap-6">
+
+      <!-- Statua 3D — cella grande, canvas trasparente, nessuno sfondo -->
+      <div class="fade-up md:col-span-2 md:row-span-2 glass relative overflow-hidden p-6 md:p-8 flex flex-col">
+        <div id="statue-wrap" class="relative w-full flex-1 min-h-[320px] sm:min-h-[400px] md:min-h-[460px]">
+          <canvas id="statue-canvas" class="w-full h-full block" aria-hidden="true"></canvas>
+          <p id="statue-fallback" class="hidden absolute inset-0 items-center justify-center text-xs text-gray-600 uppercase tracking-widest">Discobolo — scultura in 3D</p>
+        </div>
+        <p class="text-center text-[10px] tracking-[0.25em] uppercase text-gray-600 mt-3">Discobolo · scansione 3D, dominio pubblico (SMK — Statens Museum for Kunst) · ruota con lo scroll</p>
       </div>
-      <p class="text-center text-[10px] tracking-[0.25em] uppercase text-gray-600 mt-2">Discobolo · scansione 3D, dominio pubblico (SMK — Statens Museum for Kunst)</p>
-    </div>
-    <div class="fade-up order-1 md:order-2 text-center md:text-left">
-      <p class="font-display text-2xl md:text-3xl leading-snug text-white/95">
-        "Ogni statua racconta una scena. Ogni scena, un secolo di mestiere."
-      </p>
-      <p class="mt-5 text-gold-muted text-xs tracking-[0.3em] uppercase">Famiglia De Angelis — IV Generazione, Cinecittà</p>
+
+      <!-- Citazione / claim del laboratorio -->
+      <div class="fade-up d1 glass glass-hover p-7 flex flex-col justify-center">
+        <p class="font-display text-xl md:text-2xl leading-snug text-white/95">
+          "Ogni statua racconta una scena. Ogni scena, un secolo di mestiere."
+        </p>
+        <p class="mt-4 text-gold-champagne text-[11px] tracking-[0.28em] uppercase">Famiglia De Angelis — IV Generazione, Cinecittà</p>
+      </div>
+
+      <!-- Contatore generazioni / anni -->
+      <div class="fade-up d2 glass glass-hover p-7 flex items-center gap-6">
+        <div>
+          <p class="font-display text-3xl text-gold-champagne stat-number" data-target="4" data-suffix="">0</p>
+          <p class="text-[11px] text-gray-400 mt-1 tracking-wide">Generazioni</p>
+        </div>
+        <div class="h-10 w-px bg-gold-champagne/20"></div>
+        <div>
+          <p class="font-display text-3xl text-gold-champagne stat-number" data-target="100" data-suffix="+">0</p>
+          <p class="text-[11px] text-gray-400 mt-1 tracking-wide">Anni di storia</p>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- ============ SERVIZI — card in vetro su foto reale ============ -->
+<!-- ============ SERVIZI — card in vetro su fondale atmosferico ============ -->
 <section id="servizi" class="atmo atmo-scrim-dark relative py-24 md:py-32 overflow-hidden">
   <div class="atmo-parallax" data-parallax="0.15">
     <img class="atmo-img pan-b" style="object-position:center 22%"
@@ -475,42 +598,50 @@
          alt="Studi di Cinecittà, Roma">
   </div>
 
-  <div class="relative z-10 max-w-7xl mx-auto px-5 md:px-8">
-    <div class="max-w-2xl mb-16 fade-up">
-      <p class="uppercase tracking-[0.3em] text-xs text-gold-muted mb-4">I Nostri Servizi</p>
-      <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight">
+  <div class="relative z-10 max-w-6xl mx-auto px-5 md:px-8">
+    <div class="max-w-2xl mb-14 fade-up">
+      <p class="uppercase tracking-[0.3em] text-[11px] text-gold-champagne mb-4">I Nostri Servizi</p>
+      <h2 class="font-display text-3xl md:text-4xl font-bold leading-tight">
         Dal bozzetto al set, ogni fase in un unico laboratorio
       </h2>
     </div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="glass-card fade-up d1 group p-7">
-        <div class="icon-tile h-12 w-12 flex items-center justify-center border border-gold/40 text-gold mb-6 group-hover:bg-gold group-hover:text-cinema-black transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36 6.36l-.7-.7M6.34 6.34l-.7-.7m12.02 0l-.7.7M6.34 17.66l-.7.7M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6" style="perspective:1200px">
+      <div class="glass glass-card tilt glass-hover fade-up d1 group p-7">
+        <div class="tilt-inner">
+          <div class="icon-tile h-12 w-12 flex items-center justify-center rounded-2xl border-[0.5px] border-gold-champagne/40 text-gold-champagne mb-6 group-hover:bg-gold-champagne group-hover:text-cinema-black transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36 6.36l-.7-.7M6.34 6.34l-.7-.7m12.02 0l-.7.7M6.34 17.66l-.7.7M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+          </div>
+          <h3 class="font-display text-xl mb-3">Calchi e Statue</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Gesso, resina, vetroresina e bronzo. Riproduzioni fedeli e opere originali per set e collezioni.</p>
         </div>
-        <h3 class="font-display text-xl mb-3">Calchi e Statue</h3>
-        <p class="text-sm text-gray-400 leading-relaxed">Gesso, resina, vetroresina e bronzo. Riproduzioni fedeli e opere originali per set e collezioni.</p>
       </div>
-      <div class="glass-card fade-up d2 group p-7">
-        <div class="icon-tile h-12 w-12 flex items-center justify-center border border-gold/40 text-gold mb-6 group-hover:bg-gold group-hover:text-cinema-black transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4a4 4 0 014-4h10a4 4 0 014 4v4M7 13V7a5 5 0 0110 0v6"/></svg>
+      <div class="glass glass-card tilt glass-hover fade-up d2 group p-7">
+        <div class="tilt-inner">
+          <div class="icon-tile h-12 w-12 flex items-center justify-center rounded-2xl border-[0.5px] border-gold-champagne/40 text-gold-champagne mb-6 group-hover:bg-gold-champagne group-hover:text-cinema-black transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21v-4a4 4 0 014-4h10a4 4 0 014 4v4M7 13V7a5 5 0 0110 0v6"/></svg>
+          </div>
+          <h3 class="font-display text-xl mb-3">Scenografie &amp; Set Design</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Realizzazione completa da bozzetto o concept, per produzioni cinematografiche, TV ed eventi.</p>
         </div>
-        <h3 class="font-display text-xl mb-3">Scenografie &amp; Set Design</h3>
-        <p class="text-sm text-gray-400 leading-relaxed">Realizzazione completa da bozzetto o concept, per produzioni cinematografiche, TV ed eventi.</p>
       </div>
-      <div class="glass-card fade-up d3 group p-7">
-        <div class="icon-tile h-12 w-12 flex items-center justify-center border border-gold/40 text-gold mb-6 group-hover:bg-gold group-hover:text-cinema-black transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-9.5a2.121 2.121 0 013 3L12 16l-4 1 1-4 8.5-8.5z"/></svg>
+      <div class="glass glass-card tilt glass-hover fade-up d3 group p-7">
+        <div class="tilt-inner">
+          <div class="icon-tile h-12 w-12 flex items-center justify-center rounded-2xl border-[0.5px] border-gold-champagne/40 text-gold-champagne mb-6 group-hover:bg-gold-champagne group-hover:text-cinema-black transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-9.5a2.121 2.121 0 013 3L12 16l-4 1 1-4 8.5-8.5z"/></svg>
+          </div>
+          <h3 class="font-display text-xl mb-3">Restauro Scenografico</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Restauro artistico e conservativo di opere, calchi storici e allestimenti museali.</p>
         </div>
-        <h3 class="font-display text-xl mb-3">Restauro Scenografico</h3>
-        <p class="text-sm text-gray-400 leading-relaxed">Restauro artistico e conservativo di opere, calchi storici e allestimenti museali.</p>
       </div>
-      <div class="glass-card fade-up d4 group p-7">
-        <div class="icon-tile h-12 w-12 flex items-center justify-center border border-gold/40 text-gold mb-6 group-hover:bg-gold group-hover:text-cinema-black transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+      <div class="glass glass-card tilt glass-hover fade-up d4 group p-7">
+        <div class="tilt-inner">
+          <div class="icon-tile h-12 w-12 flex items-center justify-center rounded-2xl border-[0.5px] border-gold-champagne/40 text-gold-champagne mb-6 group-hover:bg-gold-champagne group-hover:text-cinema-black transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          </div>
+          <h3 class="font-display text-xl mb-3">Noleggio Props</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">Oggetti di scena iconici disponibili per noleggio, catalogati e pronti per la produzione.</p>
         </div>
-        <h3 class="font-display text-xl mb-3">Noleggio Props</h3>
-        <p class="text-sm text-gray-400 leading-relaxed">Oggetti di scena iconici disponibili per noleggio, catalogati e pronti per la produzione.</p>
       </div>
     </div>
   </div>
@@ -519,17 +650,17 @@
 <!-- ============ PORTFOLIO / FILMOGRAFIA — griglia a dimensioni uniformi ============ -->
 <section id="filmografia" class="relative py-24 md:py-32 overflow-hidden">
   <div class="relative max-w-7xl mx-auto px-5 md:px-8">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-14 fade-up">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12 fade-up">
       <div class="max-w-2xl">
-        <p class="uppercase tracking-[0.3em] text-xs text-gold-muted mb-4">Portfolio</p>
-        <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight">Filmografia &amp; Progetti</h2>
+        <p class="uppercase tracking-[0.3em] text-[11px] text-gold-champagne mb-4">Portfolio</p>
+        <h2 class="font-display text-3xl md:text-4xl font-bold leading-tight">Filmografia &amp; Progetti</h2>
       </div>
 
-      <div id="filter-buttons" class="glass-pill no-scrollbar flex flex-nowrap items-center gap-2 p-2 max-w-full overflow-x-auto">
-        <button data-filter="all" class="filter-btn active-filter shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs tracking-widest uppercase border border-gold bg-gold text-cinema-black transition-colors">Tutti</button>
-        <button data-filter="cinema-tv" class="filter-btn shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs tracking-widest uppercase border border-transparent text-gray-300 hover:border-gold hover:text-gold transition-colors">Cinema &amp; TV</button>
-        <button data-filter="eventi-design" class="filter-btn shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs tracking-widest uppercase border border-transparent text-gray-300 hover:border-gold hover:text-gold transition-colors">Eventi &amp; Design</button>
-        <button data-filter="restauri" class="filter-btn shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-xs tracking-widest uppercase border border-transparent text-gray-300 hover:border-gold hover:text-gold transition-colors">Restauri</button>
+      <div id="filter-buttons" class="glass-pill no-scrollbar flex flex-nowrap items-center gap-1 p-1.5 max-w-full overflow-x-auto">
+        <button data-filter="all" class="filter-btn pill-item is-active shrink-0 px-4 py-2 text-[11px] tracking-widest uppercase font-medium">Tutti</button>
+        <button data-filter="cinema-tv" class="filter-btn pill-item shrink-0 px-4 py-2 text-[11px] tracking-widest uppercase font-medium">Cinema &amp; TV</button>
+        <button data-filter="eventi-design" class="filter-btn pill-item shrink-0 px-4 py-2 text-[11px] tracking-widest uppercase font-medium">Eventi &amp; Design</button>
+        <button data-filter="restauri" class="filter-btn pill-item shrink-0 px-4 py-2 text-[11px] tracking-widest uppercase font-medium">Restauri</button>
       </div>
     </div>
 
@@ -739,7 +870,7 @@
   </div>
 </section>
 
-<!-- ============ FORM RICHIEDI PROGETTO — su foto reale, vetro leggibile ============ -->
+<!-- ============ FORM RICHIEDI PROGETTO — card glassmorphica, pill switchers ============ -->
 <section id="richiedi-progetto" class="atmo atmo-scrim-dark relative py-24 md:py-32 overflow-hidden">
   <div class="atmo-parallax" data-parallax="0.15">
     <img class="atmo-img pan-c" style="object-position:center 65%"
@@ -747,24 +878,26 @@
          alt="Colonnato romano">
   </div>
 
-  <div class="relative z-10 max-w-4xl mx-auto px-5 md:px-8">
-    <div class="text-center max-w-xl mx-auto mb-14 fade-up">
-      <p class="uppercase tracking-[0.3em] text-xs text-gold-muted mb-4">Contattaci</p>
-      <h2 class="font-display text-3xl md:text-4xl font-semibold leading-tight mb-4">Richiedi un Progetto</h2>
-      <p class="text-gray-300">Raccontaci la tua idea: ti risponderemo entro 48 ore lavorative con una prima valutazione.</p>
+  <div class="relative z-10 max-w-3xl mx-auto px-5 md:px-8">
+    <div class="text-center max-w-xl mx-auto mb-12 fade-up">
+      <p class="uppercase tracking-[0.3em] text-[11px] text-gold-champagne mb-4">Contattaci</p>
+      <h2 class="font-display text-3xl md:text-4xl font-bold leading-tight mb-4">Richiedi un Progetto</h2>
+      <p class="text-gray-300 text-sm">Raccontaci la tua idea: ti risponderemo entro 48 ore lavorative con una prima valutazione.</p>
     </div>
 
-    <form id="project-form" class="glass-solid fade-up p-6 md:p-10 grid sm:grid-cols-2 gap-6">
+    <form id="project-form" class="glass-solid fade-up p-6 md:p-9 grid sm:grid-cols-2 gap-5">
 
       <!-- Consegna via FormSubmit.co: nessuna registrazione, invia le risposte via email. -->
       <input type="hidden" name="_subject" value="Nuova richiesta progetto — sito Famiglia De Angelis">
       <input type="hidden" name="_captcha" value="false">
       <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+      <input type="hidden" name="Tempistiche" id="f-tempistiche" required>
+      <input type="hidden" name="Budget" id="f-budget" required>
 
       <div class="sm:col-span-2">
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tipologia di progetto *</label>
-        <select name="Tipologia di progetto" required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
-          <option value="">Seleziona...</option>
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Tipologia di progetto *</label>
+        <select name="Tipologia di progetto" required class="fld w-full">
+          <option value="">Seleziona…</option>
           <option>Film / TV</option>
           <option>Evento / Allestimento</option>
           <option>Restauro</option>
@@ -773,98 +906,95 @@
       </div>
 
       <div>
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Nome Azienda / Produzione / Nome e Cognome *</label>
-        <input type="text" name="Nome" required placeholder="Es. Mario Rossi / Cinecittà Studios" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Nome Azienda / Produzione / Nome e Cognome *</label>
+        <input type="text" name="Nome" required placeholder="Es. Mario Rossi / Cinecittà Studios" class="fld w-full">
       </div>
 
       <div>
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Telefono *</label>
-        <input type="tel" name="Telefono" required placeholder="+39 000 000 0000" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Telefono *</label>
+        <input type="tel" name="Telefono" required placeholder="+39 000 000 0000" class="fld w-full">
       </div>
 
       <div class="sm:col-span-2">
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Email *</label>
-        <input type="email" name="email" required placeholder="nome@azienda.com" class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600">
-      </div>
-
-      <div>
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Tempistiche desiderate *</label>
-        <select name="Tempistiche" required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
-          <option value="">Seleziona...</option>
-          <option>Urgente (&lt; 2 settimane)</option>
-          <option>1 - 3 mesi</option>
-          <option>In programmazione</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Budget indicativo *</label>
-        <select name="Budget" required class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm">
-          <option value="">Seleziona...</option>
-          <option>&lt; 5.000€</option>
-          <option>5.000€ - 15.000€</option>
-          <option>&gt; 15.000€</option>
-          <option>Da definire</option>
-        </select>
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Email *</label>
+        <input type="email" name="email" required placeholder="nome@azienda.com" class="fld w-full">
       </div>
 
       <div class="sm:col-span-2">
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Descrizione del progetto / Note *</label>
-        <textarea name="Descrizione progetto" required rows="5" placeholder="Raccontaci il tuo progetto: contesto, riferimenti, esigenze particolari..." class="w-full rounded-lg bg-cinema-black/60 border border-cinema-line focus:border-gold outline-none text-white px-4 py-3 text-sm placeholder:text-gray-600 resize-none"></textarea>
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Tempistiche desiderate *</label>
+        <div class="glass-pill switch-group flex flex-wrap gap-1 p-1.5" data-target="f-tempistiche">
+          <button type="button" class="pill-item px-4 py-2 text-xs" data-value="Urgente (< 2 settimane)">Urgente (&lt; 2 sett.)</button>
+          <button type="button" class="pill-item px-4 py-2 text-xs" data-value="1 - 3 mesi">1 – 3 mesi</button>
+          <button type="button" class="pill-item px-4 py-2 text-xs" data-value="In programmazione">In programmazione</button>
+        </div>
       </div>
 
       <div class="sm:col-span-2">
-        <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2">Moodboard / Bozzetti (opzionale)</label>
-        <label for="file-upload" class="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-cinema-line hover:border-gold px-4 py-8 text-center cursor-pointer transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gold-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5"/></svg>
-          <span id="file-label" class="text-sm text-gray-500">Trascina i file qui o <span class="text-gold">sfoglia</span></span>
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Budget indicativo *</label>
+        <div class="glass-pill switch-group flex flex-wrap gap-1 p-1.5" data-target="f-budget">
+          <button type="button" class="pill-item px-4 py-2 text-xs" data-value="< 5.000€">&lt; 5.000€</button>
+          <button type="button" class="pill-item px-4 py-2 text-xs" data-value="5.000€ - 15.000€">5.000 – 15.000€</button>
+          <button type="button" class="pill-item px-4 py-2 text-xs" data-value="> 15.000€">&gt; 15.000€</button>
+          <button type="button" class="pill-item px-4 py-2 text-xs" data-value="Da definire">Da definire</button>
+        </div>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Descrizione del progetto / Note *</label>
+        <textarea name="Descrizione progetto" required rows="5" placeholder="Raccontaci il tuo progetto: contesto, riferimenti, esigenze particolari…" class="fld w-full resize-none"></textarea>
+      </div>
+
+      <div class="sm:col-span-2">
+        <label class="block text-[11px] uppercase tracking-widest text-gray-400 mb-2">Moodboard / Bozzetti (opzionale)</label>
+        <label for="file-upload" class="flex flex-col items-center justify-center gap-2 rounded-2xl border-[0.5px] border-dashed border-gold-champagne/30 hover:border-gold-champagne/70 px-4 py-8 text-center cursor-pointer transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gold-champagne/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5"/></svg>
+          <span id="file-label" class="text-sm text-gray-500">Trascina i file qui o <span class="text-gold-champagne">sfoglia</span></span>
           <span class="text-xs text-gray-600">PDF, JPG, PNG — max 20MB</span>
         </label>
         <input id="file-upload" type="file" name="Allegato" class="hidden" multiple accept=".pdf,.jpg,.jpeg,.png">
       </div>
 
       <div class="sm:col-span-2 flex items-start gap-3">
-        <input id="privacy-check" type="checkbox" required class="mt-1 accent-gold h-4 w-4">
-        <label for="privacy-check" class="text-xs text-gray-500">Ho letto e accetto la <a href="#" class="text-gold-muted underline">Privacy Policy</a> e acconsento al trattamento dei dati per essere ricontattato/a.</label>
+        <input id="privacy-check" type="checkbox" required class="mt-1 accent-[#D4AF37] h-4 w-4">
+        <label for="privacy-check" class="text-xs text-gray-500">Ho letto e accetto la <a href="#" class="text-gold-champagne underline">Privacy Policy</a> e acconsento al trattamento dei dati per essere ricontattato/a.</label>
       </div>
 
-      <div class="sm:col-span-2 pt-2">
-        <button type="submit" id="project-form-submit" class="btn-apple btn-glossy w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-gold text-cinema-black font-semibold px-9 py-4 tracking-wide hover:bg-gold-light">
+      <div class="sm:col-span-2 pt-1">
+        <button type="submit" id="project-form-submit" class="cta-glow w-full sm:w-auto inline-flex justify-center items-center gap-2 px-9 py-4 text-sm">
           Invia Richiesta Progetto
         </button>
       </div>
 
-      <div id="form-feedback" class="sm:col-span-2 hidden rounded-lg border border-gold/40 bg-gold/10 text-gold-light text-sm px-5 py-4">
+      <div id="form-feedback" class="sm:col-span-2 hidden rounded-2xl border-[0.5px] border-gold-champagne/40 bg-gold-champagne/10 text-gold-light text-sm px-5 py-4">
         Grazie! La tua richiesta è stata inviata. Il nostro team ti risponderà entro 48 ore lavorative.
       </div>
-      <div id="form-error" class="sm:col-span-2 hidden rounded-lg border border-red-500/40 bg-red-500/10 text-red-300 text-sm px-5 py-4">
+      <div id="form-error" class="sm:col-span-2 hidden rounded-2xl border-[0.5px] border-red-500/40 bg-red-500/10 text-red-300 text-sm px-5 py-4">
         Non siamo riusciti a inviare la richiesta. Riprova, oppure scrivici direttamente a info@famigliadeangelis.it.
       </div>
     </form>
+
+    <!-- Studio Location — widget mappa stilizzata dark con pin ambra -->
+    <div id="contatti" class="glass fade-up mt-6 p-1.5 overflow-hidden">
+      <div class="loc-map relative rounded-[22px] overflow-hidden h-56 grid place-items-center">
+        <div class="loc-pin"></div>
+        <div class="relative text-center px-4">
+          <p class="font-display text-lg text-white">Cinecittà Studios</p>
+          <p class="text-xs text-gray-400 mt-1">Studi di Cinecittà, Via Tuscolana 1055 — Roma</p>
+          <p class="text-xs text-gray-400">Laboratori · Via Libero Leonardi 110</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-xs">
+        <span class="text-gray-400">Tel <span class="text-gray-300">+39 06 0000 0000</span> <span class="text-gray-600">(da aggiornare)</span></span>
+        <span class="text-gray-400">Email <span class="text-gray-300">info@famigliadeangelis.it</span></span>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ============ CONTATTI STRIP ============ -->
-<section id="contatti" class="relative py-20 overflow-hidden">
-  <div class="relative max-w-7xl mx-auto px-5 md:px-8 grid sm:grid-cols-3 gap-8 text-center sm:text-left fade-up">
-    <div>
-      <p class="text-xs uppercase tracking-widest text-gold-muted mb-2">Laboratorio</p>
-      <p class="text-gray-300 text-sm">Studi di Cinecittà, Via Tuscolana 1055 — Roma</p>
-    </div>
-    <div>
-      <p class="text-xs uppercase tracking-widest text-gold-muted mb-2">Telefono</p>
-      <p class="text-gray-300 text-sm">+39 06 0000 0000 <span class="text-gray-600">(sostituire)</span></p>
-    </div>
-    <div>
-      <p class="text-xs uppercase tracking-widest text-gold-muted mb-2">Email</p>
-      <p class="text-gray-300 text-sm">info@famigliadeangelis.it</p>
-    </div>
-  </div>
-</section>
-
-<!-- ============ FOOTER ============ -->
-<footer class="relative">
-  <div class="max-w-7xl mx-auto px-5 md:px-8 pt-16 pb-10">
+<!-- ============ FOOTER — dock di vetro sospeso ============ -->
+<footer class="relative pb-8 pt-6">
+  <div class="max-w-6xl mx-auto px-5 md:px-8">
+   <div class="glass p-7 md:p-9">
     <div class="grid md:grid-cols-4 gap-10 mb-12">
       <div class="md:col-span-2">
         <p class="font-display text-lg tracking-wide mb-3">FAMIGLIA DE ANGELIS</p>
@@ -896,12 +1026,16 @@
       </div>
     </div>
 
-    <div class="pt-8 flex flex-col md:flex-row gap-3 justify-between text-xs text-gray-600">
+    <div class="pt-8 mt-8 border-t border-gold-champagne/10 flex flex-col md:flex-row md:items-center gap-3 justify-between text-xs text-gray-600">
       <p>FAMIGLIA DE ANGELIS S.R.L. — P.IVA 17033161005</p>
       <p>Sede: Via Libero Leonardi 110 — Laboratori a Cinecittà, Roma</p>
-      <p>&copy; <span id="year"></span> Famiglia De Angelis S.r.l. Tutti i diritti riservati.</p>
+      <button id="back-to-top" type="button" class="glass-pill pill-item inline-flex items-center gap-2 px-4 py-2 text-[11px] uppercase tracking-widest text-gold-champagne">
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+        Torna su
+      </button>
     </div>
-    <p class="text-[11px] text-gray-700 mt-4">Fotografie ed elementi grafici segnaposto da Wikimedia Commons (licenze CC/PD — meandro ornamentale di Andrikkos, CC BY-SA 3.0) — da sostituire con l'archivio fotografico e il logo propri del laboratorio prima della messa online.</p>
+    <p class="text-[11px] text-gray-700 mt-4">&copy; <span id="year"></span> Famiglia De Angelis S.r.l. · Fotografie ed elementi grafici segnaposto da Wikimedia Commons (licenze CC/PD — meandro ornamentale di Andrikkos, CC BY-SA 3.0), da sostituire con l'archivio fotografico e il logo propri del laboratorio prima della messa online.</p>
+   </div>
   </div>
 </footer>
 
@@ -957,6 +1091,39 @@
     updateParallax();
   }
 
+  // ===== 3D parallax tilt on glass cards (pointer-driven) =====
+  if (!reduceMotion && window.matchMedia('(pointer:fine)').matches) {
+    document.querySelectorAll('.tilt').forEach(card => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--ry', (px * 9).toFixed(2) + 'deg');
+        card.style.setProperty('--rx', (-py * 9).toFixed(2) + 'deg');
+      });
+      card.addEventListener('pointerleave', () => {
+        card.style.setProperty('--ry', '0deg');
+        card.style.setProperty('--rx', '0deg');
+      });
+    });
+  }
+
+  // ===== Glass pill switchers (budget / timeline) =====
+  document.querySelectorAll('.switch-group').forEach(group => {
+    const target = document.getElementById(group.dataset.target);
+    group.querySelectorAll('.pill-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.pill-item').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        if (target) target.value = btn.dataset.value;
+      });
+    });
+  });
+
+  // ===== Back to top =====
+  const backToTop = document.getElementById('back-to-top');
+  if (backToTop) backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -996,12 +1163,8 @@
 
   filterButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      filterButtons.forEach(b => {
-        b.classList.remove('active-filter', 'bg-gold', 'text-cinema-black', 'border-gold');
-        b.classList.add('border-transparent', 'text-gray-300');
-      });
-      btn.classList.add('active-filter', 'bg-gold', 'text-cinema-black', 'border-gold');
-      btn.classList.remove('border-transparent', 'text-gray-300');
+      filterButtons.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
 
       const filter = btn.dataset.filter;
       portfolioItems.forEach(item => {
