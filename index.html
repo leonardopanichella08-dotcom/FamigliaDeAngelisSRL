@@ -321,6 +321,10 @@
   @keyframes marquee{ from{ transform: translateX(0); } to{ transform: translateX(-50%); } }
   @media (prefers-reduced-motion: reduce){ .marquee-track{ animation: none; } }
 
+  /* ============ HERO COPY — nessun riquadro, testo leggibile sullo sfondo animato ============ */
+  .hero-copy{ text-shadow: 0 2px 18px rgba(0,0,0,0.75), 0 1px 4px rgba(0,0,0,0.6); }
+  .hero-copy p{ text-shadow: 0 2px 14px rgba(0,0,0,0.8), 0 1px 3px rgba(0,0,0,0.7); }
+
   /* ============ HERITAGE PILLAR CARDS ============ */
   .pillar-card::after{ content:""; position:absolute; inset:0; z-index:0; border-radius:inherit;
     background: linear-gradient(to top, rgba(10,10,12,0.94) 0%, rgba(10,10,12,0.45) 55%, rgba(10,10,12,0.15) 100%); }
@@ -441,15 +445,15 @@
     <div class="figure-drift"></div>
   </div>
 
-  <div class="relative z-10 w-full max-w-2xl mx-auto px-5">
-    <div class="glass fade-up in-view text-center px-7 py-10 md:px-12 md:py-14">
-      <span class="inline-flex items-center gap-2 glass-pill px-4 py-1.5 text-[11px] tracking-[0.22em] uppercase text-gold-champagne mb-7">
+  <div class="relative z-10 w-full max-w-3xl mx-auto px-5">
+    <div class="fade-up in-view text-center flex flex-col items-center hero-copy">
+      <span class="inline-flex items-center gap-2 glass-pill px-4 py-1.5 text-[11px] tracking-[0.22em] uppercase text-gold-champagne mb-8">
         <span aria-hidden="true">✦</span> Cinecittà • Dal 1919
       </span>
-      <h1 class="font-display text-3xl sm:text-5xl md:text-[3.4rem] font-bold leading-[1.05] mb-6" style="text-wrap:balance">
+      <h1 class="font-display text-4xl sm:text-6xl md:text-[4rem] font-bold leading-[1.04] mb-6" style="text-wrap:balance">
         DIAMO FORMA<br class="hidden sm:block"> ALL'<span class="text-gradient-gold">IMMAGINAZIONE</span>.
       </h1>
-      <p class="text-gray-300 text-[15px] md:text-base leading-relaxed max-w-lg mx-auto mb-9">
+      <p class="text-gray-200 text-[15px] md:text-lg leading-relaxed max-w-xl mx-auto mb-9">
         Da oltre un secolo realizziamo calchi, statue e scenografie per i capolavori del cinema italiano e internazionale negli Studi di Cinecittà.
       </p>
       <div class="flex flex-col sm:flex-row gap-3 justify-center">
