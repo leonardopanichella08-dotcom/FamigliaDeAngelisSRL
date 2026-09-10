@@ -198,7 +198,7 @@
   .photo-frame:hover img{ transform: scale(1.05); filter: saturate(1) contrast(1.05) brightness(1); }
   .photo-frame .frame-overlay{
     position:absolute; inset:0; pointer-events:none;
-    background: linear-gradient(to top, rgba(6,5,7,0.94) 0%, rgba(6,5,7,0.42) 40%, rgba(6,5,7,0.04) 66%);
+    background: linear-gradient(to top, rgba(10,10,13,0.94) 0%, rgba(10,10,13,0.4) 42%, rgba(10,10,13,0.03) 68%);
   }
   .photo-frame .frame-caption{
     position:absolute; left:0; right:0; bottom:0; padding:1.15rem 1.3rem 1.05rem;
@@ -225,32 +225,38 @@
   .bg-ambient{
     position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none;
     background:
-      radial-gradient(120% 80% at 15% 0%, #121216 0%, #0A0A0C 60%),
+      radial-gradient(90% 60% at 20% -5%, rgba(230,197,148,0.05) 0%, transparent 55%),
+      radial-gradient(130% 90% at 50% 0%, #131319 0%, #0B0B0F 55%),
       #0A0A0C;
+  }
+  .bg-ambient::before{
+    /* vignettatura morbida uniforme su tutta la pagina */
+    content:""; position:absolute; inset:0;
+    background: radial-gradient(120% 90% at 50% 40%, transparent 45%, rgba(0,0,0,0.55) 100%);
   }
   .bg-ambient::after{
     content:""; position:absolute; inset:0;
-    background-image: radial-gradient(rgba(255,255,255,0.018) 1px, transparent 1px);
-    background-size: 3px 3px; opacity:.6;
+    background-image: radial-gradient(rgba(255,255,255,0.014) 1px, transparent 1px);
+    background-size: 3px 3px; opacity:.5;
   }
-  .liquid-blob{ position:absolute; border-radius:50%; filter: blur(90px); will-change: transform; }
-  .liquid-blob.gold{ background: radial-gradient(circle, rgba(212,175,55,0.34), transparent 72%); }
-  .liquid-blob.warm{ background: radial-gradient(circle, rgba(230,197,148,0.22), transparent 72%); }
-  .liquid-blob.pale{ background: radial-gradient(circle, rgba(241,225,190,0.20), transparent 72%); }
+  .liquid-blob{ position:absolute; border-radius:50%; filter: blur(120px); will-change: transform; mix-blend-mode: screen; }
+  .liquid-blob.gold{ background: radial-gradient(circle, rgba(212,175,55,0.22), transparent 70%); }
+  .liquid-blob.warm{ background: radial-gradient(circle, rgba(230,197,148,0.16), transparent 70%); }
+  .liquid-blob.pale{ background: radial-gradient(circle, rgba(241,225,190,0.13), transparent 70%); }
   @keyframes liquidDrift1{
     0%,100%{ transform: translate(0,0) scale(1); }
-    33%{ transform: translate(10%,-13%) scale(1.15); }
-    66%{ transform: translate(-9%,9%) scale(0.9); }
+    33%{ transform: translate(6%,-8%) scale(1.1); }
+    66%{ transform: translate(-6%,6%) scale(0.94); }
   }
   @keyframes liquidDrift2{
     0%,100%{ transform: translate(0,0) scale(1); }
-    50%{ transform: translate(-12%,10%) scale(1.12); }
+    50%{ transform: translate(-8%,7%) scale(1.08); }
   }
-  .liquid-blob:nth-child(1){ animation: liquidDrift1 10s ease-in-out infinite; }
-  .liquid-blob:nth-child(2){ animation: liquidDrift2 8s ease-in-out infinite; animation-delay: -3s; }
-  .liquid-blob:nth-child(3){ animation: liquidDrift1 13s ease-in-out infinite reverse; animation-delay: -5s; }
-  .liquid-blob:nth-child(4){ animation: liquidDrift2 11s ease-in-out infinite reverse; animation-delay: -2s; }
-  .liquid-blob:nth-child(5){ animation: liquidDrift1 15s ease-in-out infinite; animation-delay: -8s; }
+  .liquid-blob:nth-child(1){ animation: liquidDrift1 34s ease-in-out infinite; }
+  .liquid-blob:nth-child(2){ animation: liquidDrift2 28s ease-in-out infinite; animation-delay: -6s; }
+  .liquid-blob:nth-child(3){ animation: liquidDrift1 40s ease-in-out infinite reverse; animation-delay: -12s; }
+  .liquid-blob:nth-child(4){ animation: liquidDrift2 36s ease-in-out infinite reverse; animation-delay: -4s; }
+  .liquid-blob:nth-child(5){ animation: liquidDrift1 44s ease-in-out infinite; animation-delay: -18s; }
   @media (prefers-reduced-motion: reduce){ .liquid-blob{ animation: none; } }
 
   /* ============ ATMOSPHERIC FULL-BLEED SECTIONS ============ */
@@ -264,9 +270,9 @@
   .atmo-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; will-change: transform; }
   .atmo-scrim-dark::after{
     content:""; position:absolute; inset:0; z-index:1;
-    background: linear-gradient(180deg, rgba(7,6,5,0.92) 0%, rgba(7,6,5,0.82) 45%, rgba(7,6,5,0.93) 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
+    background: linear-gradient(180deg, rgba(10,10,13,0.9) 0%, rgba(10,10,13,0.68) 45%, rgba(10,10,13,0.92) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20%, #000 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 20%, #000 80%, transparent 100%);
   }
 
   /* Foto di sfondo: pan/zoom ben visibile sull'hero, più discreto nelle altre sezioni atmosferiche */
@@ -605,12 +611,11 @@
     <div class="grid md:grid-cols-3 md:grid-rows-2 gap-5 md:gap-6">
 
       <!-- Statua 3D — cella grande, canvas trasparente, nessuno sfondo -->
-      <div class="fade-up md:col-span-2 md:row-span-2 glass relative overflow-hidden p-6 md:p-8 flex flex-col">
-        <div id="statue-wrap" class="relative w-full flex-1 min-h-[320px] sm:min-h-[400px] md:min-h-[460px]">
+      <div class="fade-up md:col-span-2 md:row-span-2 relative p-2 flex flex-col">
+        <div id="statue-wrap" class="relative w-full flex-1 min-h-[340px] sm:min-h-[440px] md:min-h-[520px]">
           <canvas id="statue-canvas" class="w-full h-full block" aria-hidden="true"></canvas>
           <p id="statue-fallback" class="hidden absolute inset-0 items-center justify-center text-xs text-gray-600 uppercase tracking-widest">Discobolo — scultura in 3D</p>
         </div>
-        <p class="text-center text-[10px] tracking-[0.25em] uppercase text-gray-600 mt-3">Discobolo · scansione 3D, dominio pubblico (SMK — Statens Museum for Kunst) · ruota con lo scroll</p>
       </div>
 
       <!-- Citazione / claim del laboratorio -->
